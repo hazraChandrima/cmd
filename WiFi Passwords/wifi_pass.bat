@@ -1,5 +1,5 @@
 :: this batch script extracts WiFi passowrds of all the interfaces, your device has previously connected to, and saves them in a file named wifi_passwords.txt 
-:: run this script in your terminal simply by writing the name of the batch file
+:: run this script in your terminal simply by writing the name of the batch file in the saved directory 
 
 
 @echo off
