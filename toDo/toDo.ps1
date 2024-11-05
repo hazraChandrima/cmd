@@ -1,5 +1,4 @@
 # a script that maintains a silly toDo list, nothing more, nothing less!
-# Written by: Chandrima Hazra
 
 $Host.UI.RawUI.BackgroundColor = "Black"
 $Host.UI.RawUI.ForegroundColor = "White"
