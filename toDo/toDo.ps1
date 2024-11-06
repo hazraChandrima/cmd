@@ -1,4 +1,4 @@
-# a script that maintains a silly toDo list, nothing more, nothing less!
+# a script that maintains a useless toDo list, nothing more, nothing less!
 
 $Host.UI.RawUI.BackgroundColor = "Black"
 $Host.UI.RawUI.ForegroundColor = "White"
