@@ -82,5 +82,6 @@ function toDo {
 }
 
 toDo
-
 		
+$Host.UI.RawUI.ForegroundColor = $Host.UI.RawUI.OriginalForegroundColor
+$Host.UI.RawUI.BackgroundColor = $Host.UI.RawUI.OriginalBackgroundColor
