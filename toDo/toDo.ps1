@@ -1,5 +1,4 @@
-# A script that maintains a silly toDo list, nothing more, nothing less!
-# Written by: Chandrima Hazra
+# a script that maintains a useless toDo list, nothing more, nothing less!
 
 $Host.UI.RawUI.BackgroundColor = "Black"
 $Host.UI.RawUI.ForegroundColor = "White"
@@ -84,5 +83,4 @@ function toDo {
 
 toDo
 
-$Host.UI.RawUI.ForegroundColor = $Host.UI.RawUI.OriginalForegroundColor
-$Host.UI.RawUI.BackgroundColor = $Host.UI.RawUI.OriginalBackgroundColor
+		
