@@ -1,4 +1,4 @@
-# a script that maintains a useless toDo list, nothing more, nothing less!
+# A script that maintains a useless to-do list, nothing more, nothing less!
 
 $Host.UI.RawUI.BackgroundColor = "Black"
 $Host.UI.RawUI.ForegroundColor = "White"
@@ -10,21 +10,31 @@ if (!(Test-Path -Path $PSScriptRoot)) {
 }
 
 $listPath = "$PSScriptRoot\tasks.json"
-$flag=$true
 
 if (Test-Path -Path $listPath) {
-    $tasks = [System.Collections.ArrayList](Get-Content -Path $listPath | ConvertFrom-Json)
+    $jsonContent = Get-Content -Path $listPath | ConvertFrom-Json
+    if ($jsonContent -is [System.Object[]] -or $jsonContent -is [System.Collections.ArrayList]) {
+        $tasks = [System.Collections.ArrayList]$jsonContent
+    } elseif ($jsonContent -is [string]) { # cuz apparently, it can't convert strings to arraylist :/
+        $tasks = New-Object System.Collections.ArrayList
+        $tasks.Add($jsonContent) | Out-Null
+    } else {
+        $tasks = New-Object System.Collections.ArrayList
+    }
 } else {
     $tasks = New-Object System.Collections.ArrayList
 }
 
-# Saves the to-do tasks in file tasks.json in the same directory as the script
+
+# Saves the to-do tasks in file tasks.json in the same directory as this script
 function saveList {
-    Clear-Content $listPath
     $tasks | ConvertTo-Json | Set-Content -Path $listPath
 }
 
+
+
 function toDo {
+    $flag = $true  
     while ($flag) {
         Write-Host "`nEnter:`t'view' to view your to-do list`n`t'add' to add a new task`n`t'delete' to delete a task`n`t'clear' to clear the entire list`n`t'exit' to exit" -ForegroundColor "DarkYellow"
         $choice = Read-Host
@@ -44,6 +54,7 @@ function toDo {
                 Write-Host "`nEnter a new task:" -ForegroundColor "DarkYellow"
                 $newTask = Read-Host
                 $tasks.Add($newTask) | Out-Null
+		saveList
                 Write-Host "`nTask '$newTask' added successfully!" -ForegroundColor "Green"
             }
             "delete" {
@@ -57,6 +68,7 @@ function toDo {
                         if ([int]::TryParse($taskIndex, [ref]$null) -and ($taskIndex -gt 0) -and ($taskIndex -le $tasks.Count)) {
                             $deletedTask = $tasks[$taskIndex - 1]
                             $tasks.RemoveAt($taskIndex - 1)
+			    saveList
                             Write-Host "`nTask '$deletedTask' deleted successfully!" -ForegroundColor "Green"
                             break
                         } else {
@@ -68,12 +80,13 @@ function toDo {
             "clear" {
                 $tasks = New-Object System.Collections.ArrayList
                 Clear-Content $listPath
+		saveList
                 Write-Host "`nTo-do list cleared successfully!" -ForegroundColor "Green"
             }
             "exit" {
                 Write-Host "`nExited.`n" -ForegroundColor "Cyan"
                 saveList
-		$flag=$false
+                $flag = $false  
                 break
             }
             default {
