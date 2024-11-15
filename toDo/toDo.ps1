@@ -10,6 +10,7 @@ if (!(Test-Path -Path $PSScriptRoot)) {
 }
 
 $listPath = "$PSScriptRoot\tasks.json"
+$flag=$true
 
 if (Test-Path -Path $listPath) {
     $tasks = [System.Collections.ArrayList](Get-Content -Path $listPath | ConvertFrom-Json)
@@ -24,7 +25,7 @@ function saveList {
 }
 
 function toDo {
-    while ($true) {
+    while ($flag) {
         Write-Host "`nEnter:`t'view' to view your to-do list`n`t'add' to add a new task`n`t'delete' to delete a task`n`t'clear' to clear the entire list`n`t'exit' to exit" -ForegroundColor "DarkYellow"
         $choice = Read-Host
 
@@ -72,6 +73,7 @@ function toDo {
             "exit" {
                 Write-Host "`nExited.`n" -ForegroundColor "Cyan"
                 saveList
+		$flag=$false
                 break
             }
             default {
@@ -82,6 +84,3 @@ function toDo {
 }
 
 toDo
-		
-$Host.UI.RawUI.ForegroundColor = $Host.UI.RawUI.OriginalForegroundColor
-$Host.UI.RawUI.BackgroundColor = $Host.UI.RawUI.OriginalBackgroundColor
