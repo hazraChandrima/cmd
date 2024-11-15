@@ -1,0 +1,91 @@
+#!/bin/bash
+# a script that maintains a silly todo list, nothing more, nothing less!
+
+#first of all, mentioning the colors
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+MAGENTA='\e[35m'
+CYAN='\e[36m'
+WHITE='\e[37m'
+RESET='\e[0m'
+
+list_path="./tasks.txt"
+
+echo -e "${CYAN}\n----- Welcome! -----"
+
+if [[ ! -f $list_path ]]; then
+	touch $list_path
+fi
+
+save_list() {
+	> "$list_path"
+	for task in "${tasks[@]}"; do
+		echo "$task" >> "$list_path"
+	done
+}
+
+load_tasks() {
+	mapfile -t tasks < "$list_path"
+}
+
+
+todo() {
+
+	while true; do
+		echo -e "${YELLOW}\nEnter:\t'view' to view your to-do list\n\t'add' to add a new task\n\t'delete' to delete a task\n\t'clear' to clear the entire list\n\t'exit' to exit${RESET}"
+		read -rp "> " choice
+
+		case "$choice" in
+			"exit")
+				save_list
+				echo -e "\n${BLUE}Exited.${RESET}\n"
+				exit
+			;;
+			"clear")
+				> "$list_path"
+				save_list
+				echo -e "\n${GREEN}To-Do list cleared successfully!${RESET}"
+			;;
+			"view")
+				if [[ ${#tasks[@]} -eq 0 ]]; then
+					echo -e "\n${BLUE}No tasks to view.${RESET}"
+				else
+					for i in "${!tasks[@]}"; do
+						echo -e "${MAGENTA}$((i+1)). ${WHITE}${tasks[i]}${RESET}"
+					done
+				fi
+			;;
+			"add")
+				echo -e "\n${YELLOW}Enter a new task: "
+				read -r new_task
+				echo "$new_task" >> "$list_path"
+				load_tasks
+				echo -e "\n${GREEN}Task '$new_task' added successfully!"
+			;;
+			"delete")
+				if [[ ${#tasks[@]} -eq 0 ]]; then
+					echo -e "\n${BLUE}No task to delete"
+				else
+					echo -e "\n${YELLOW}Enter the task number you want to delete: ${RESET}"
+					read -r index
+					if [[ $index =~ ^[0-9]+$ ]] && (( index > 0)) && (( index <= ${#tasks[@]} )); then
+						del_task=${tasks[index - 1]}
+						unset 'tasks[index - 1]'
+						save_list
+						echo -e "${GREEN}\nTask '$del_task' deleted successfully!"
+					else
+						echo -e "\n${RED}Please enter a valid index!${RESET}"
+					fi
+				fi
+			;;
+			*)
+				echo -e "\n${RED}Invalid choice entered!"
+			;;
+		esac
+	done
+}
+
+load_tasks
+todo
