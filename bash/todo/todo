@@ -119,7 +119,7 @@ while [[ $# -gt 0 ]]; do
 			;;
 		-a)
 			if [[ -z $2 ]]; then
-				echo -e "\n${RED}Missing task name for -a.${RESET}"
+				echo -e "\n${RED}Missing task name for -a. Use -h for help.${RESET}"
 				exit 1
 			else
 				add_task "$2"
