@@ -1,7 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # a script that maintains a silly todo list, nothing more, nothing less!
 
-#first of all, mentioning the colors
+# Usage: todo [-h] [-l] [-a <task_name>] [-d <task_number>] [-clr]
+# Options:
+# -h			Display help message 
+# -l			List all your tasks
+# -a <task_name>	Add a new task
+# -d <task_number>	Delete a task by its number
+# -clr			Clears the entire to-do list
+
+
+
+
+#first of all, defining the colors
 RED='\e[31m'
 GREEN='\e[32m'
 YELLOW='\e[33m'
@@ -11,13 +22,16 @@ CYAN='\e[36m'
 WHITE='\e[37m'
 RESET='\e[0m'
 
+
 list_path="./tasks.txt"
 
-echo -e "${CYAN}\n----- Welcome! -----"
+echo -e "${CYAN}\n----- Silly To-Do List -----${RESET}\n"
+
 
 if [[ ! -f $list_path ]]; then
 	touch $list_path
 fi
+
 
 save_list() {
 	> "$list_path"
@@ -26,66 +40,114 @@ save_list() {
 	done
 }
 
+
 load_tasks() {
 	mapfile -t tasks < "$list_path"
 }
 
 
-todo() {
+show_help() {
+	echo -e "${YELLOW}\nUsage: todo [-h] [-l] [-a <task_name>] [-d <task_number>] [-clr]"
+	echo -e "\nOptions:"
+	echo -e "  -h               Display this help message"
+	echo -e "  -l               List all your tasks"
+	echo -e "  -a <task_name>   Add a new task"
+	echo -e "  -d <task_number> Delete a task by its number"
+	echo -e "  -clr             Clear the entire to-do list${RESET}"
+}
 
-	while true; do
-		echo -e "${YELLOW}\nEnter:\t'view' to view your to-do list\n\t'add' to add a new task\n\t'delete' to delete a task\n\t'clear' to clear the entire list\n\t'exit' to exit${RESET}"
-		read -rp "> " choice
 
-		case "$choice" in
-			"exit")
-				save_list
-				echo -e "\n${BLUE}Exited.${RESET}\n"
-				exit
-			;;
-			"clear")
-				> "$list_path"
-				save_list
-				echo -e "\n${GREEN}To-Do list cleared successfully!${RESET}"
-			;;
-			"view")
-				if [[ ${#tasks[@]} -eq 0 ]]; then
-					echo -e "\n${BLUE}No tasks to view.${RESET}"
-				else
-					for i in "${!tasks[@]}"; do
-						echo -e "${MAGENTA}$((i+1)). ${WHITE}${tasks[i]}${RESET}"
-					done
-				fi
-			;;
-			"add")
-				echo -e "\n${YELLOW}Enter a new task: "
-				read -r new_task
-				echo "$new_task" >> "$list_path"
-				load_tasks
-				echo -e "\n${GREEN}Task '$new_task' added successfully!"
-			;;
-			"delete")
-				if [[ ${#tasks[@]} -eq 0 ]]; then
-					echo -e "\n${BLUE}No task to delete"
-				else
-					echo -e "\n${YELLOW}Enter the task number you want to delete: ${RESET}"
-					read -r index
-					if [[ $index =~ ^[0-9]+$ ]] && (( index > 0)) && (( index <= ${#tasks[@]} )); then
-						del_task=${tasks[index - 1]}
-						unset 'tasks[index - 1]'
-						save_list
-						echo -e "${GREEN}\nTask '$del_task' deleted successfully!"
-					else
-						echo -e "\n${RED}Please enter a valid index!${RESET}"
-					fi
-				fi
-			;;
-			*)
-				echo -e "\n${RED}Invalid choice entered!"
-			;;
-		esac
-	done
+list_tasks() {
+	if [[ ${#tasks[@]} -eq 0 ]]; then
+		echo -e "\n${BLUE}No tasks to view.${RESET}"
+	else
+		for i in "${!tasks[@]}"; do
+			echo -e "${MAGENTA}$((i+1)). ${WHITE}${tasks[i]}${RESET}"
+		done
+	fi
+}
+
+
+add_task() {
+	local task="$1"
+	if [[ -z task ]]; then
+		echo -e "\n${RED}Task name cannot be empty.${RESET}"
+	else 
+		echo "$task" >> "$list_path"
+		load_tasks
+		echo -e "\n${GREEN}Task '$task' added successfully!"
+	fi	
+}
+
+
+delete_task() {
+	local index="$1"
+	if [[ ! $index =~ ^[0-9]+$ ]] || (( index <= 0 )) || (( index > ${#tasks[@]} )); then
+		echo -e "\n${RED}Error: Invalid task number.${RESET}"
+	else
+		local del_task=${tasks[index - 1]}
+		unset 'tasks[index - 1]'
+		save_list
+		echo -e "\n${GREEN}Task '$del_task' deleted successfully!${RESET}"
+	fi
+}
+
+
+clear_list() {
+	> "$list_path"
+	unset tasks
+	tasks=()
+	echo -e "\n${GREEN}To-Do list cleared successfully!${RESET}"
 }
 
 load_tasks
-todo
+
+if [[ $# -eq 0 ]]; then
+	show_help
+	exit 0
+fi
+
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		-h)
+			show_help
+			exit 0
+			;;
+		-l)
+			list_tasks
+			shift
+			;;
+		-a)
+			if [[ -z $2 ]]; then
+				echo -e "\n${RED}Missing task name for -a.${RESET}"
+				exit 1
+			else
+				add_task "$2"
+				shift 2
+			fi
+			;;
+		-d)
+			if [[ ${#tasks[@]} -eq 0 ]]; then
+				echo -e "\n${BLUE}No task to delete"
+				exit 0
+			elif [[ -z $2 ]]; then
+				echo -e "\n${RED}Error: Task number is missing. Use -h for help.${RESET}"
+				exit 1
+    		elif [[ ! $2 =~ ^[0-9]+$ ]]; then
+        		echo -e "\n${RED}Error: Task number '$2' is invalid. It must be a positive integer.${RESET}"
+        		exit 1
+			else
+				delete_task "$2"
+				exit 0
+    		fi
+			;;
+		-clr)
+			clear_list
+			shift
+			;;
+		*)
+			echo -e "\n${RED}Error: Invalid option '$1'. Use -h for help.${RESET}"
+			exit 1
+			;;
+	esac
+done
