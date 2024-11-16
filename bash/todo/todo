@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# a script that maintains a silly todo list, nothing more, nothing less!
+# a script that maintains a silly todo list...
 
 # Usage: todo [-h] [-l] [-a <task_name>] [-d <task_number>] [-clr]
 # Options:
@@ -133,13 +133,13 @@ while [[ $# -gt 0 ]]; do
 			elif [[ -z $2 ]]; then
 				echo -e "\n${RED}Error: Task number is missing. Use -h for help.${RESET}"
 				exit 1
-    		elif [[ ! $2 =~ ^[0-9]+$ ]]; then
-        		echo -e "\n${RED}Error: Task number '$2' is invalid. It must be a positive integer.${RESET}"
-        		exit 1
+    			elif [[ ! $2 =~ ^[0-9]+$ ]]; then
+        			echo -e "\n${RED}Error: Task number '$2' is invalid. It must be a positive integer.${RESET}"
+        			exit 1
 			else
 				delete_task "$2"
 				exit 0
-    		fi
+    			fi
 			;;
 		-clr)
 			clear_list
