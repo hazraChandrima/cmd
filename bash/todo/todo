@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# a script that maintains a silly todo list, nothing more, nothing less!
+# a script that maintains a silly todo list...
 
 # Usage: todo [-h] [-l] [-a <task_name>] [-d <task_number>] [-clr]
 # Options:
