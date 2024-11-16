@@ -127,7 +127,7 @@ while [[ $# -gt 0 ]]; do
 				echo -e "\n${BLUE}No task to delete"
 				exit 0
 			elif [[ -z $2 ]]; then
-				echo -e "\n${RED}Error: Task number is missing. Use -h for help.${RESET}"
+				echo -e "\n${RED}Missing task number for -d. Use -h for help.${RESET}"
 				exit 1
     			elif [[ ! $2 =~ ^[0-9]+$ ]]; then
         			echo -e "\n${RED}Error: Task number '$2' is invalid. It must be a positive integer.${RESET}"
