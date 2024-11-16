@@ -70,13 +70,9 @@ list_tasks() {
 
 add_task() {
 	local task="$1"
-	if [[ -z task ]]; then
-		echo -e "\n${RED}Task name cannot be empty.${RESET}"
-	else 
-		echo "$task" >> "$list_path"
-		load_tasks
-		echo -e "\n${GREEN}Task '$task' added successfully!"
-	fi	
+	echo "$task" >> "$list_path"
+	load_tasks
+	echo -e "\n${GREEN}Task '$task' added successfully!"
 }
 
 
